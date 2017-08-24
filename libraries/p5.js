@@ -5252,7 +5252,7 @@ exports.sizeOf = sizeOf;
 
     function timedOut() {
       self._timedOut = true
-      self.request.abort()      
+      self.request.abort()
     }
 
     function error(resp, msg, t) {
@@ -14256,6 +14256,31 @@ p5.prototype.redraw = function () {
       userDraw();
       this._registeredMethods.post.forEach(callMethod);
     }
+  }
+};
+
+p5.prototype.update = function (drawFunction) {
+  this.resetMatrix();
+  if(this._renderer.isP3D){
+    this._renderer._update();
+  }
+
+  console.log("something")
+
+  var userSetup = this.setup || window.setup;
+  var userDraw = drawFunction || window.draw;
+  if (typeof userDraw === 'function') {
+    if (typeof userSetup === 'undefined') {
+      this.scale(this._pixelDensity, this._pixelDensity);
+    }
+    var self = this;
+    var callMethod = function (f) {
+      f.call(self);
+    };
+    this._registeredMethods.pre.forEach(callMethod);
+    userDraw();
+    this._registeredMethods.post.forEach(callMethod);
+
   }
 };
 

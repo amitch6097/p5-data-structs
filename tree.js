@@ -1,3 +1,6 @@
+var SIZE;
+var ANIMATION_TIME = 1000; //miliseconds
+
 function Tree(x, y, size, node){
   var that = this;
 
@@ -82,20 +85,20 @@ function Tree(x, y, size, node){
 
     while(true){
       if(tempNode.getDigit() > nodeToAdd.getDigit()){
+        animationWrapper(animateLeft, tempNode, nodeToAdd);
         if(tempNode.left === undefined){
           that.addLeft(tempNode, nodeToAdd);
           break;
         }else{
-          // animateLeft(tempNode, nodeToAdd, 0);
           tempNode = tempNode.left;
           continue
         }
       } else {
+        animationWrapper(animateRight, tempNode, nodeToAdd);
         if(tempNode.right === undefined){
           that.addRight(tempNode, nodeToAdd);
           break;
         }else{
-          // animateRight(tempNode, nodeToAdd, 0);
           tempNode = tempNode.right;
           continue
         }
@@ -104,16 +107,16 @@ function Tree(x, y, size, node){
   }
 
   this.addLeft = function(parent, child){
-    // child.setSizing(parent.x - parent.size, parent.y + parent.size, parent.size)
+    child.setSizing(parent.x - parent.size, parent.y + parent.size, parent.size)
     parent.left = child;
     child.setParent(parent);
-    animateLeft(parent, child, 0);
+    // animateLeft(parent, child, 0);
   }
   this.addRight = function(parent, child){
-    // child.setSizing(parent.x + parent.size, parent.y + parent.size, parent.size)
+    child.setSizing(parent.x + parent.size, parent.y + parent.size, parent.size)
     parent.right = child;
     child.setParent(parent);
-    animateRight(parent, child, 0);
+    // animateRight(parent, child, 0);
   }
 
 
@@ -121,29 +124,66 @@ function Tree(x, y, size, node){
   ///to do this we need to draw the one circle, but when done this somehow
   //screws up the location
 
-  function animateLeft (parent, child, i) {
-    setTimeout(function () {
-      child.setSizing(parent.x - i, parent.y + i, parent.size)
-      that.show();
-      child.show();
-      i+= parent.size/10;
-      if (i <= parent.size) {
-         animateLeft(parent, child, i);
+  //TODO animation is still wonky maybe need to register functions instead, you changes p5 so maybe change that back
+  //or look into more force draw()
+
+  function animationWrapper(func, parent, child){
+      var currentTime = new Date().getTime();
+      var iterations = 10;
+      var iteration_time = ANIMATION_TIME/iterations;
+
+      var i = 0;
+      while (currentTime + ANIMATION_TIME >= new Date().getTime()) {
+        if(new Date().getTime() >= currentTime + iteration_time*i){
+          // update(func(parent, child, i));
+          update(drawSomething);
+          forceRedraw(document.getElementById("defaultCanvas0"))
+          i++;
+        }
       }
-    }, 100)
+  }
+
+  function drawSomething(){
+    console.log("drawing")
+    ellipse(100, 100, 100);
+  }
+
+
+  function animateLeft (parent, child, i) {
+    var iterations = 10;
+    var movement = (parent.size/iterations) * i;
+
+    child.setSizing(parent.x - movement, parent.y + movement, parent.size)
+    // that.show();
+    // fill(255)
+
+    ellipse(parent.x - movement, parent.y + movement, parent.size)
+    // child.show();
+    // p5.prototype.draw();
+    // console.log(document);
+    // console.log(child)
   }
 
   function animateRight (parent, child, i) {
-    setTimeout(function () {
-      child.setSizing(parent.x + i, parent.y + i, parent.size)
-      that.show();
-      child.show();
-      i+= parent.size/10;
-      if (i <= parent.size) {
-         animateRight(parent, child, i);
-      }
-    }, 100)
+    var iterations = 10;
+    var movement = (parent.size/iterations) * i;
+
+    child.setSizing(parent.x + movement, parent.y + movement, parent.size)
+    that.show();
+    child.show();
   }
+
+  // function animateRight (parent, child, i) {
+  //   setTimeout(function () {
+  //     child.setSizing(parent.x + i, parent.y + i, parent.size)
+  //     that.show();
+  //     child.show();
+  //     i+= parent.size/10;
+  //     if (i <= parent.size) {
+  //        animateRight(parent, child, i);
+  //     }
+  //   }, 100)
+  // }
 }
 
 function sFact(num)
@@ -211,4 +251,5 @@ function Node(digit){
     ellipse(that.x, that.y, that.size);
     text(that.digit, that.x-textSize()/2, that.y+textSize()/4);
   }
+
 }

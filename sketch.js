@@ -13,3 +13,14 @@ function setup() {
   addButton.mousePressed(tree.addNode)
 
 }
+
+function draw(){
+
+}
+
+var forceRedraw = function(element){
+  var disp = element.style.display;
+  element.style.display = 'none';
+  var trick = element.offsetHeight;
+  element.style.display = disp;
+};
